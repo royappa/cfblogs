@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CFRecentActionsHttp, RecentAction } from '../models/cfmodels';
 
 @Component({
   selector: 'app-home',
@@ -9,26 +9,25 @@ import { HttpClient } from '@angular/common/http';
 })
 export class HomePage implements OnInit {
 
-  blogEntries: any[];
+  recentActions: RecentAction[];
+  CODEFORCES = 'https://codeforces.com';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
-    this.blogEntries = [];
+    this.recentActions = [];
     const ids = [];
     this.http.get('https://codeforces.com/api/recentActions?maxCount=100').subscribe(
-      data => { 
-          data['result'].forEach(e => {
-            const id = e.blogEntry.id;
-            const title = e.blogEntry.title;
-            if (!ids.includes(id)) {
-              this.blogEntries.push({id, title});
-              ids.push(id);
-            }
-          });
-        }
+      (data: CFRecentActionsHttp) => {
+        data.result.forEach(ra => {
+          const id = ra.blogEntry.id;
+          if (!ids.includes(id)) {
+            ra.blogEntry.title = ra.blogEntry.title.replace(/<[^>]*>?/gm, '');
+            this.recentActions.push(ra);
+            ids.push(id);
+          }
+        });
+      }
     );
-
-
   }
 }
