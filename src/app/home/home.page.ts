@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CFRecentActionsHttp, RecentAction } from '../models/cfmodels';
+import { BlogEntry } from '../models/cfmodels';
 
 @Component({
   selector: 'app-home',
@@ -9,25 +9,20 @@ import { CFRecentActionsHttp, RecentAction } from '../models/cfmodels';
 })
 export class HomePage implements OnInit {
 
-  recentActions: RecentAction[];
+  blogEntries: BlogEntry[];
   CODEFORCES = 'https://codeforces.com';
 
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
-    this.recentActions = [];
-    const ids = [];
-    this.http.get('https://codeforces.com/api/recentActions?maxCount=100').subscribe(
-      (data: CFRecentActionsHttp) => {
-        data.result.forEach(ra => {
-          const id = ra.blogEntry.id;
-          if (!ids.includes(id)) {
-            ra.blogEntry.title = ra.blogEntry.title.replace(/<[^>]*>?/gm, '');
-            this.recentActions.push(ra);
-            ids.push(id);
-          }
-        });
+    this.blogEntries = [];
+    this.http.get('https://us-central1-codeforces-blogs.cloudfunctions.net/getBlogEntries').subscribe(
+      (data: any) => {
+        data.forEach(be => {
+          this.blogEntries.push(be);
+        })
       }
     );
   }
+
 }

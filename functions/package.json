@@ -14,8 +14,15 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@angular/common": "^8.2.2",
+    "@google-cloud/firestore": "^2.2.7",
+    "@types/cors": "^2.8.6",
+    "@types/lodash": "^4.14.138",
+    "axios": "^0.19.0",
+    "cors": "^2.8.5",
     "firebase-admin": "^8.0.0",
-    "firebase-functions": "^3.1.0"
+    "firebase-functions": "^3.1.0",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "tslint": "^5.12.0",

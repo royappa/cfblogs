@@ -10,12 +10,12 @@
   <div class="ion-padding">
     Recent Blogs
     <ion-list>
-      <ion-item *ngFor="let r of recentActions">
-          {{ r.timeSeconds*1000 | date : 'short' }}
+      <ion-item *ngFor="let be of blogEntries">
+          {{ be.updateTimeSeconds*1000 | date : 'short' }}
           &nbsp;
-          <a href="{{CODEFORCES}}/profile/{{r.blogEntry.authorHandle}}" target="_blank">{{ r.blogEntry.authorHandle }}</a>
+          <a href="{{CODEFORCES}}/profile/{{be.authorHandle}}" target="_blank">{{ be.authorHandle }}</a>
           → 
-          <a href="{{CODEFORCES}}/blog/entry/{{r.blogEntry.id}}" target="_blank">{{ r.blogEntry.title }}</a>
+          <a href="{{CODEFORCES}}/blog/entry/{{be.id}}" target="_blank">{{ be.title }}</a>
       </ion-item>
     </ion-list>
   </div>
