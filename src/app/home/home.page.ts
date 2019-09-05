@@ -16,13 +16,10 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     this.blogEntries = [];
-    this.http.get('https://us-central1-codeforces-blogs.cloudfunctions.net/getBlogEntries').subscribe(
-      (data: any) => {
-        data.forEach(be => {
-          this.blogEntries.push(be);
-        })
-      }
-    );
+    this.http.get('https://us-central1-codeforces-blogs.cloudfunctions.net/getBlogEntries')
+      .subscribe(
+        (data: any) => { this.blogEntries = data; }
+      );
   }
 
 }
