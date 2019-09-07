@@ -29,11 +29,14 @@ exports.updateRecentBlogs = functions.pubsub.schedule('every 10 minutes').onRun(
         if (!ids.includes(id)) {
           ra.blogEntry.title = ra.blogEntry.title.replace(/<[^>]*>?/gm, '');
           ra.blogEntry.updateTimeSeconds = ra.timeSeconds;
+          if ('comment' in ra) {
+            ra.blogEntry.lastComment = ra.comment;
+          }          
           recentBlogs.push(ra.blogEntry);
           ids.push(id);
         }
       });
-      const promises = recentBlogs.map((be: any) => firestore.collection('blogEntries').doc("" + be.id).set(be));
+      const promises = recentBlogs.map((be:any) => firestore.collection('blogEntries').doc(""+be.id).set(be, {merge: true}));
       await Promise.all(promises);
       console.log({ status: 'OK', date: Date.now() });
     }
@@ -50,6 +53,7 @@ exports.updateRecentBlogs = functions.pubsub.schedule('every 10 minutes').onRun(
 
 
 // Clone of above mainly for testing
+// https://us-central1-codeforces-blogs.cloudfunctions.net/updateRecentActions
 export const updateRecentActions = functions.https.onRequest((req, res) => {
 
   // CORS wrapper: check later to make sure this is not too permissive
@@ -67,11 +71,14 @@ export const updateRecentActions = functions.https.onRequest((req, res) => {
           if (!ids.includes(id)) {
             ra.blogEntry.title = ra.blogEntry.title.replace(/<[^>]*>?/gm, '');
             ra.blogEntry.updateTimeSeconds = ra.timeSeconds;
+            if ('comment' in ra) {
+              ra.blogEntry.lastComment = ra.comment;
+            }
             recentBlogs.push(ra.blogEntry);
             ids.push(id);
           }
         });
-        const promises = recentBlogs.map((be:any) => firestore.collection('blogEntries').doc(""+be.id).set(be));
+        const promises = recentBlogs.map((be:any) => firestore.collection('blogEntries').doc(""+be.id).set(be, {merge: true}));
         await Promise.all(promises);
         res.status(200).send({status: 'OK', date: Date.now()});
       }
