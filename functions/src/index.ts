@@ -16,7 +16,7 @@ const axios = require('axios');
 const cfURL = 'https://codeforces.com/api/recentActions?maxCount=100';
 
 //creates scheduler job firebase-schedule-updateRecentBlogs-us-central1
-exports.updateRecentBlogs = functions.pubsub.schedule('every 10 minutes').onRun(async (context) => {
+exports.updateRecentBlogs = functions.pubsub.schedule('every 5 minutes').onRun(async (context) => {
   // MAIN FUNCTION BODY (INSIDE CONTEXT)
   try {
     const response = await axios.get(cfURL);
@@ -35,10 +35,17 @@ exports.updateRecentBlogs = functions.pubsub.schedule('every 10 minutes').onRun(
           recentBlogs.push(ra.blogEntry);
           ids.push(id);
         }
+        else {
+          if ('comment' in ra) {
+            const pos = recentBlogs.findIndex((be: any) => be.id === id);
+            if (pos !== -1 && !('comment' in recentBlogs[pos])) {
+              recentBlogs[pos].comment = ra.comment;
+            }
+          }
+        }
       });
       const promises = recentBlogs.map((be:any) => firestore.collection('blogEntries').doc(""+be.id).set(be, {merge: true}));
       await Promise.all(promises);
-      console.log({ status: 'OK', date: Date.now() });
     }
     else {
       console.log({ error: 'Remote server error.' });
@@ -66,7 +73,7 @@ export const updateRecentActions = functions.https.onRequest((req, res) => {
       if (data.status === 'OK') {  
         const recentBlogs: any = [];
         const ids: any = [];  
-        data.result.forEach((ra: any) => {
+        data.result.forEach((ra: any) => {          
           const id = ra.blogEntry.id;
           if (!ids.includes(id)) {
             ra.blogEntry.title = ra.blogEntry.title.replace(/<[^>]*>?/gm, '');
@@ -77,6 +84,14 @@ export const updateRecentActions = functions.https.onRequest((req, res) => {
             recentBlogs.push(ra.blogEntry);
             ids.push(id);
           }
+          else {
+            if ('comment' in ra) {
+              const pos = recentBlogs.findIndex((be: any) => be.id === id);
+              if (pos !== -1 && !('comment' in recentBlogs[pos])) {
+                recentBlogs[pos].comment = ra.comment;
+              }
+            }
+          }          
         });
         const promises = recentBlogs.map((be:any) => firestore.collection('blogEntries').doc(""+be.id).set(be, {merge: true}));
         await Promise.all(promises);

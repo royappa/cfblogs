@@ -7,16 +7,19 @@
 </ion-header>
 
 <ion-content>
-  <div class="ion-padding">
-    Recent Blogs
-    <ion-list>
-      <ion-item *ngFor="let be of blogEntries">
-          {{ be.updateTimeSeconds*1000 | date : 'short' }}
-          &nbsp;
-          <a href="{{CODEFORCES}}/profile/{{be.authorHandle}}" target="_blank">{{ be.authorHandle }}</a>
-          → 
-          <a href="{{CODEFORCES}}/blog/entry/{{be.id}}" target="_blank">{{ be.title }}</a>
-      </ion-item>
-    </ion-list>
-  </div>
-</ion-content>
+  <ul *ngIf="blogEntries$ | async as blogEntries else noData">
+    <li *ngFor="let be of blogEntries">
+        <span class="date">{{ be.updateTimeSeconds*1000 | date : 'short' }}</span>           
+        &nbsp;
+        <a class="handle" href="{{CODEFORCES}}/profile/{{be.authorHandle}}" target="_blank">{{ be.authorHandle }}</a>
+        → 
+        <a class="ref" href="{{CODEFORCES}}/blog/entry/{{be.id}}" target="_blank">{{ be.title | unescape }}</a>  
+        &nbsp;
+        <a *ngIf="be.lastComment" class="ref" href="{{CODEFORCES}}/blog/entry/{{be.id}}?#comment-{{be.lastComment.id}}" target="_blank"># </a>        
+    </li>
+  </ul>
+  <ng-template #noData>
+    <div>Loading...</div>
+    <ion-spinner name="circles"></ion-spinner>
+  </ng-template>
+</ion-content>  
